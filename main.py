@@ -91,7 +91,7 @@ def main():
             twitter_run(input_text)
 
 
-    print("_____________SUCESSFULLY RAN___MG_____BOT__________")
+    print("__________SUCESSFULLY___RAN___MG_____BOT__________")
     return
 
 
