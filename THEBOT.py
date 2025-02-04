@@ -2,7 +2,8 @@ import tweepy
 import os
 from dotenv import load_dotenv
 import discord
-from TwitchDownload import TwitchDownloadMain
+from TwitchClipDownload import TwitchDownloadMain
+from YoutubeClipDownload import YoutubeClipDownloadMain
 
 load_dotenv("keys.env")
 
@@ -14,6 +15,8 @@ T_BEARER_TOKEN = os.getenv("T_BEARER_TOKEN")
 T_CLIENT_ID = os.getenv("T_CLIENT_ID")
 T_CLIENT_SECRET = os.getenv("T_CLIENT_SECRET")
 D_TOKEN = os.getenv("D_TOKEN")
+DISCORD_CHANNEL_ID = os.getenv("DISCORD_CHANNEL_ID")
+OUTPUT_FOLDER = os.getenv('OUTPUT_FOLDER')
 
 client = tweepy.Client(
     bearer_token=T_BEARER_TOKEN,
@@ -60,7 +63,7 @@ def d_post(input_text, channel_id):
 
         @client.event
         async def on_ready():
-            channel = client.get_channel(channel_id)
+            channel = client.get_channel(DISCORD_CHANNEL_ID)
             if channel:
                 await channel.send(input_text)
                 print(f"Discord: Message sent to channel")
@@ -75,8 +78,8 @@ def twitter_run(input_text, mp4_path=None):
     verifyauthtwitter()
     t_post(input_text, mp4_path)
 
-def discord_run(input_text, channel_id):
-    d_post(input_text, channel_id)
+def discord_run(input_text):
+    d_post(input_text)
 
 
 def CommandLineRun():
@@ -95,9 +98,7 @@ def CommandLineRun():
             link_answer = input("Add a link? (Y or N): ").strip().upper()
             if link_answer == 'Y':
                 link_text = input("Enter the link: ").strip()
-            #channel_id = int(input("Enter Discord Channel ID: ").strip())
-            channel_id = 1316984386217840662 # set to clip catch up
-            discord_run(f"{input_text} {link_text}", channel_id)
+            discord_run(f"{input_text} {link_text}")
 
         mp4_path = None
         if twitter_flag:
@@ -108,14 +109,19 @@ def CommandLineRun():
 
                 if media_exists_answer == 'Y':
                     filename = input("Enter the media filename (without extension): ") + '.mp4'
-                    output_folder = r"C:\Users\squil\Downloads\THEMGBOT"
-                    mp4_path = os.path.join(output_folder, filename)
+                    mp4_path = os.path.join(OUTPUT_FOLDER, filename)
                 else:
-                    link_text = input("Enter the Twitch clip link: ")
-                    filename, output_folder = TwitchDownloadMain(link_text)
-                    mp4_path = os.path.join(output_folder, filename)
+                    plat_answer = input("Which Platform is clip from (youtube or Twitch): (Y or T): ").strip().upper()
+                    if plat_answer == 'T':
+                        link_text = input("Enter the Twitch clip link: ")
+                        filename = TwitchDownloadMain(link_text)
+                        mp4_path = os.path.join(OUTPUT_FOLDER, filename)
+                    if plat_answer == 'Y':
+                        link_text = input("Enter the Youtube video link: ")
+                        filename = YoutubeClipDownloadMain(link_text)
+                        mp4_path = os.path.join(OUTPUT_FOLDER, filename)
 
-            twitter_run(input_text, mp4_path)
+            #twitter_run(input_text, mp4_path)
 
 
     print("----------SUCESSFULLY RAN MGBOT---------")
