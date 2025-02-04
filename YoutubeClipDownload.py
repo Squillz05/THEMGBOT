@@ -10,8 +10,9 @@ OUTPUT_FOLDER = os.path.normpath(os.getenv('OUTPUT_FOLDER'))
 def youtube_download(youtube_url,filename):
     try:
         ydl_opts = {
-            'format': 'best',
-            'outtmpl': os.path.join(OUTPUT_FOLDER, filename)
+            'format': 'bestvideo[height<=1080]+bestaudio[ext=m4a]/bestaudio',
+            'outtmpl': os.path.join(OUTPUT_FOLDER, filename),
+            'merge_output_format': 'mp4',
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
